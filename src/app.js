@@ -12,9 +12,7 @@ try {
   console.log(url)
   // Begin to run the actual application.
   const compileData = new CompileData(url)
-  console.log('hej')
   await compileData.run()
-  console.log('hej2')
 
 } catch (error) {
   console.error(error.message)

@@ -19,6 +19,7 @@ export default class Scraper {
   async scraperInit (url) {
     this.url = url
     const getDomData = await this.retrieveLinks()
+    console.log(getDomData)
     const domData = new JSDOM(getDomData)
 
     return domData

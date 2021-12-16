@@ -11,23 +11,27 @@
 /**
  * Encapsulates a Node application.
  */
-export class Scraper {
-  constructor(urls) {
-    this.urls  = urls
+export default class Scraper {
+  constructor() {
+    this.url = ''
   }
 
-  async scraperInit () {
-    const getDomData = await this.extractLinks()
-    const domData = new JSDOM(getDomData) //Gör jsonobjekt till html så att querySerlecotr går att använda.
+  async scraperInit (url) {
+    this.url = url
+    const getDomData = await this.retrieveLinks()
+    const domData = new JSDOM(getDomData)
 
-    const links = Array.from(domData.window.document.querySelectorAll('a')).map(links => links.href)
+    return domData
+
+   /*  const links = Array.from(domData.window.document.querySelectorAll('a')).map(links => links.href)
     console.log(links)
     
     return [...new Set(links)]
-  }
-  async extractLinks () {
-    const fetchedData = await fetch(this.urls)
-    return fetchedData.text()
-  }
+  }*/
   
+}
+async retrieveLinks () {
+  const fetchedData = await fetch(this.url)
+  return fetchedData.text()
+}
 }

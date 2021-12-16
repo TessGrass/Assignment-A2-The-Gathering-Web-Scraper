@@ -7,6 +7,7 @@
 
  import { JSDOM } from 'jsdom'
  import fetch from 'node-fetch'
+import Scraper from './Scraper.js'
 
 /**
  * Encapsulates a Node application.
@@ -14,20 +15,15 @@
 export class CompileData {
   constructor(url) {
     this.url = url
+    this.scraper = new Scraper()
   }
 
   async run () {
-    const data = await this.extractLinks()
-    const domData = new JSDOM(data) //Gör jsonobjekt till html så att querySerlecotr går att använda.
 
-    const links = Array.from(domData.window.document.querySelectorAll('a')).map(links => links.href)
+    const data = await this.scraper.scraperInit(this.url)
+    const links = Array.from(data.window.document.querySelectorAll('a')).map(links => links.href)
     console.log(links)
     
     return [...new Set(links)]
-  }
-  async extractLinks () {
-    const fetchedData = await fetch(this.url)
-    return fetchedData.text()
-  }
-  
+  }  
 }

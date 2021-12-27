@@ -138,9 +138,44 @@ export class CompileData {
     this.checkDinner()
   }
 
+  
+  /**
+   *
+   */
+   async checkDinner () {
+   
+    let dom
+
+    await fetch('https://cscloud6-127.lnu.se/scraper-site-2/dinner/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+      },
+      body: 'username=zeke&password=coys&submit=login',
+      redirect: 'manual',
+      credentials: 'include'
+    }).then(async resp => {
+      if (resp.status === 302) {
+        dom = await fetch(resp.headers.get('location'), {
+          method: 'GET',
+          headers: {
+            Cookie: resp.headers.get('set-cookie').substring(0, resp.headers.get('set-cookie').indexOf(';'))
+          }
+        })
+      }
+      const dinnerDom = new JSDOM(await dom.text())
+      this.dinners = Array.from(dinnerDom.window.document.querySelectorAll('input'))
+        .map(input => input.value)
+      this.dinners.pop()
+    })
+    console.log(this.dinners)
+    this.compareDinnerDays()
+  }
 
 
   compareDinnerDays() {
+    
+
 
   }
 }

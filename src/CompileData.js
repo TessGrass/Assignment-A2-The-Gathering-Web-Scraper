@@ -25,6 +25,8 @@ export class CompileData {
     this.arrayOfMovies = []
     this.cinemaResult = []
     this.dinners = []
+    this.matchedDaysAndDinners = []
+    this.namedDays = []
   }
 
   /**
@@ -174,8 +176,26 @@ export class CompileData {
 
 
   compareDinnerDays() {
+    this.changeNumbersToDays()
+
+    for (const dinner of this.dinners) {
+      const dinnerDay = dinner.substring(0, 3)
+      for (const day of this.namedDays) {
+        if (dinnerDay === day) this.matchedDaysAndDinners.push(dinner) 
+      }
+    }
+    console.log(this.matchedDaysAndDinners)
+
     
 
 
+  }
+
+  changeNumbersToDays() {
+    for (const day of this.weekDay) {
+      if (day === '05') this.namedDays.push('fri')
+      else if (day === '06') this.namedDays.push('sat')
+      else if (day === '07') this.namedDays.push('sun')
+    }
   }
 }

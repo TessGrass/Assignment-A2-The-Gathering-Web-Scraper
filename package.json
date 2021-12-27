@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/app.js",
-    "lint": "npx eslint ./src  exit 0",
-    "lint:fix": "npx eslint ./src --fix  exit 0"
+    "lint": "npx eslint ./src || exit 0",
+    "lint:fix": "npx eslint ./src --fix || exit 0"
   },
   "contributors": [
     "Therese Grass <tg222kv@student.lnu.se>"
@@ -23,6 +23,13 @@
     "node-fetch": "^3.1.0"
   },
   "devDependencies": {
-    "@lnu/eslint-config": "^1.1.4"
+    "@lnu/eslint-config": "^1.1.4",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsdoc": "^37.3.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0"
+
   }
 }

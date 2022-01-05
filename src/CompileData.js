@@ -91,7 +91,7 @@ export class CompileData {
           object2[value] += 1
         }
       })
-      console.log(object2)
+      // console.log(object2)
     }))
 
     const validDays = Object.entries(object2) // checks which day they all can meet.
@@ -138,18 +138,20 @@ export class CompileData {
           else if (obj.movie === '03') obj.name = cinemaArray[3].name
         })
       }
-      // console.log(this.arrayOfMovies)
     }
     this.compareDaysAndMovies()
   }
 
   /**
-   *
+   * Checks which movie/movies that is available on the day found in this.weekDay.
    */
   async compareDaysAndMovies () {
+    // console.log(this.weekDay)
     for (const movie of this.arrayOfMovies) {
       for (const day of this.weekDay) {
         if (movie.day === day) this.cinemaResult.push(movie)
+        // console.log(movie.day)
+        // console.log(day)
       }
     }
     this.checkDinner()
@@ -188,23 +190,26 @@ export class CompileData {
   }
 
   /**
-   *
+   * Checks which day that matches the day in this.namedDays.
    */
   compareDinnerDays () {
     this.changeNumbersToDays()
 
     for (const dinner of this.dinners) { // dinner = fri1416 m.fl.
       const dinnerDay = dinner.substring(0, 3) // dinnerDay = fri, sat, sun m.fl
-      for (const day of this.namedDays) {
+      for (const day of this.namedDays) { // this.namedDays = the day that is free.
         if (dinnerDay === day) this.matchedDaysAndDinners.push(dinner)
       }
     }
     this.createObjectWithTime()
   }
 
+  /**
+   * Assign the number with the name of the day it's representing.
+   */
   changeNumbersToDays () {
     for (const day of this.weekDay) {
-      const dayName = this.changeDayToShortWord(day)
+      const dayName = this.changeDayToShortWord(day) // 05 skickas in till metoden
       this.namedDays.push(dayName)
     }
   }

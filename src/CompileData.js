@@ -10,13 +10,16 @@ import fetch from 'node-fetch'
 import Scraper from './Scraper.js'
 
 /**
- *
+ * Represents a web scraper application.
  */
 export class CompileData {
   /**
-   * @param url
+   * Creates an instance of the current type.
+   *
+   * @param {string} url - represent the URL that start the application.
    */
   constructor (url) {
+    this.orginalUrl = url
     this.url = url
     this.scraper = new Scraper()
     this.links = []
@@ -27,10 +30,11 @@ export class CompileData {
     this.dinners = []
     this.matchedDaysAndDinners = []
     this.namedDays = []
+    this.dinnerObject = []
   }
 
   /**
-   *
+   * Sends and retrieve data from retrieveData method. Removes received duplicates.
    */
   async run () {
     const links = await this.retrieveData('a', 'href') // skickar argumenten till retrieveData metoden.
@@ -39,26 +43,30 @@ export class CompileData {
   }
 
   /**
-   * @param tag
-   * @param value
+   * Gets data from scraper from a given url.
+   * 
+   * @param {string} tag - the recieved argument.
+   * @param {string} value - the recieved argument.
+   * @returns {array} - Returns an array of a string with the values found in the parameter.
    */
   async retrieveData (tag, value) { // tar emot argumenten
     const data = await this.scraper.runScraper(this.url) // Får domData från Scraper med värdet i this.url
+    // console.log(Array.from(data.window.document.querySelectorAll(tag)).map(links => links[value]))
     return Array.from(data.window.document.querySelectorAll(tag)).map(links => links[value]) // Array.from skapar en array av en sträng. links[value] är andra argumentet.
   }
 
   /**
-   *
+   * Checks the persons calendar for available days.
    */
-   async checkCalendar () {
+  async checkCalendar () {
     const object2 = {}
     this.url = this.links[0] // this.url sätts om till första indexet i vår array.
     const calendarUrl = await this.retrieveData('a', 'href') // calenderUrl är en array med svaret vi fick av scraper "return Array.from.." via retrieveData.
-    console.log(calendarUrl)
-    console.log('ovanför')
+
     await Promise.all(calendarUrl.map(async name => {
       this.url = this.links[0] + name.substring(2, name.length) // substring extraherar delar av en sträng. (dvs i ./paul.html så tas ./ bort)
       const data = await this.retrieveData('td', 'textContent') // metoden retrieveData kallas på. 'td' och 'textContent' skickas med i det här fallet.
+      console.log(data)
       const lowerCaseData = data.map(name => name.toLowerCase())
       const weekdays = await this.retrieveData('th', 'textContent')
       weekdays.forEach((value, index) => {
@@ -79,19 +87,17 @@ export class CompileData {
       if (day === 'Friday') this.weekDay.push('05')
       if (day === 'Saturday') this.weekDay.push('06')
       if (day === 'Sunday') this.weekDay.push('07')
-
-      
     })
     this.checkCinema()
   }
 
   /**
    *
+   * 
    */
   async checkCinema () {
     this.url = this.links[1]
-    
-    console.log(this.url)
+
     // const cinema = await this.retrieveData('p')
     const cinema = await this.scraper.runScraper(this.url) // Får domData från Scraper med värdet i this.url
     const cinema2 = Array.from(cinema.window.document.querySelectorAll('#movie > option'))
@@ -102,36 +108,36 @@ export class CompileData {
         }
       })
 
-      for (let movie = 1; movie < cinema2.length; movie++) { // för varje film
-        for (let day = 5; day < 8; day++) {
+    for (let movie = 1; movie < cinema2.length; movie++) { // för varje film
+      for (let day = 5; day < 8; day++) {
+        let checkAvailaibility = await fetch(`https://courselab.lnu.se/scraper-site-1/cinema/check?day=0${day}&movie=0${movie}`)
+        checkAvailaibility = await checkAvailaibility.json()
 
-          let checkAvailaibility = await fetch(`https://courselab.lnu.se/scraper-site-1/cinema/check?day=0${day}&movie=0${movie}`)
-          checkAvailaibility = await checkAvailaibility.json()
+        const result = checkAvailaibility.filter(obj => {
+          return obj.status === 1
+        })
+        this.arrayOfMovies.push(result)
+        this.arrayOfMovies = this.arrayOfMovies.flat()
 
-          const result = checkAvailaibility.filter(obj => {
-            return obj.status === 1
-          })
-          this.arrayOfMovies.push(result)
-          this.arrayOfMovies = this.arrayOfMovies.flat()
+        this.arrayOfMovies.forEach(obj => {
+          if (obj.movie === '01') obj.name = cinema2[1].name
+          else if (obj.movie === '02') obj.name = cinema2[2].name
+          else if (obj.movie === '03') obj.name = cinema2[3].name
+        })
       }
 
-      
-      
-
-
-
-
-
-
-    // console.log(await this.scraper.runScraper(this.url))
+      // console.log(await this.scraper.runScraper(this.url))
 
     // const links = await this.retrieveData('a', 'href')
     // console.log(links)
-      }
-      this.compareDaysAndMovies()
+    }
+    this.compareDaysAndMovies()
   }
 
-  async compareDaysAndMovies() {
+  /**
+   *
+   */
+  async compareDaysAndMovies () {
     for (const movie of this.arrayOfMovies) {
       for (const day of this.weekDay) {
         if (movie.day === day) this.cinemaResult.push(movie)
@@ -140,15 +146,16 @@ export class CompileData {
     this.checkDinner()
   }
 
-  
   /**
    *
    */
-   async checkDinner () {
-   
+  async checkDinner () {
     let dom
 
-    await fetch('https://cscloud6-127.lnu.se/scraper-site-2/dinner/login', {
+    // ändra så site blir dynamisk
+    // https://cscloud6-127.lnu.se/scraper-site-2/dinner/login
+
+    await fetch(`${this.orginalUrl}/dinner/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
@@ -170,32 +177,23 @@ export class CompileData {
         .map(input => input.value)
       this.dinners.pop()
     })
-    console.log(this.dinners)
+
     this.compareDinnerDays()
   }
 
-
-  compareDinnerDays() {
+  /**
+   *
+   */
+  compareDinnerDays () {
     this.changeNumbersToDays()
 
     for (const dinner of this.dinners) {
       const dinnerDay = dinner.substring(0, 3)
       for (const day of this.namedDays) {
-        if (dinnerDay === day) this.matchedDaysAndDinners.push(dinner) 
+        if (dinnerDay === day) this.matchedDaysAndDinners.push(dinner)
       }
     }
-    console.log(this.matchedDaysAndDinners)
 
-    
-
-
+    this.createObjectWithTime()
   }
 
-  changeNumbersToDays() {
-    for (const day of this.weekDay) {
-      if (day === '05') this.namedDays.push('fri')
-      else if (day === '06') this.namedDays.push('sat')
-      else if (day === '07') this.namedDays.push('sun')
-    }
-  }
-}

@@ -70,7 +70,7 @@ export class CompileData {
   }
 
   /**
-   * Checks each persons calendar and find oput which day they all can meet.
+   * Checks each persons calendar to find their spare time.
    */
   async checkCalendar () {
     const object2 = {}
@@ -122,7 +122,6 @@ export class CompileData {
       })
       // console.log(cinemaArray) // the object with movie name and it's number.
     for (let movie = 1; movie < cinemaArray.length; movie++) {
-      console.log(cinemaArray)
       for (let day = 5; day < 8; day++) {
         let checkAvailaibility = await fetch(`${this.orginalUrl}/cinema/check?day=0${day}&movie=0${movie}`)
         checkAvailaibility = await checkAvailaibility.json()
@@ -147,12 +146,9 @@ export class CompileData {
    * Checks which movie/movies that is available on the day found in this.weekDay.
    */
   async compareDaysAndMovies () {
-    // console.log(this.weekDay)
     for (const movie of this.arrayOfMovies) {
       for (const day of this.weekDay) {
         if (movie.day === day) this.cinemaResult.push(movie)
-        // console.log(movie.day)
-        // console.log(day)
       }
     }
     this.checkDinner()
@@ -163,7 +159,7 @@ export class CompileData {
    */
   async checkDinner () {
     let dom
-    // CODE CREDIT / HELP: Teaching Assistance.
+    // COOKIE CODE CREDIT: Teaching Assistans.
     await fetch(`${this.orginalUrl}/dinner/login`, {
       method: 'POST',
       headers: {
@@ -220,7 +216,6 @@ export class CompileData {
    */
   createObjectWithTime () {
     for (const dinner of this.matchedDaysAndDinners) {
-      console.log(dinner)
       const day = dinner.substring(0, 3)
       let time = dinner.substring(3, 7)
       time = `${time.substring(0, 2)}:00 - ${time.substring(2, 4)}:00`
@@ -282,5 +277,18 @@ export class CompileData {
     else if (day === 'sat') result = 'saturday'
     else if (day === 'sun') result = 'sunday'
     return result
+  }
+
+  /**
+   * Prints out booking suggestion.
+   *
+   * @param {object} suggestion - represention one, or more, booking suggestion.
+   */
+  bookingOutput (suggestion) {
+    const output = suggestion.map(obj => {
+      obj.day = this.changeDayToWeekDayWord(obj.day)
+      return `* On ${obj.day}, "${obj.movie}" begins at ${obj.cinemaTime} and there is a free table to book between ${obj.dinner}`
+    })
+    console.log('\n' + 'Suggestions' + '\n' + '===========' + '\n' + output.join('\n') + '\n')
   }
 }

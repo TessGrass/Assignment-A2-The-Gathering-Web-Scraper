@@ -37,7 +37,7 @@ export class CompileData {
    * Sends and retrieve data from retrieveData method. Removes received duplicates.
    */
   async run () {
-    const links = await this.retrieveData('a', 'href') 
+    const links = await this.retrieveData('a', 'href')
     this.checkRetriveData(links, 'links') // kollar om vi fick något värde från retrieveData
     this.links = [...new Set(links)] // Sparas i en array
     this.checkCalendar()
@@ -121,7 +121,8 @@ export class CompileData {
         }
       })
       // console.log(cinemaArray) // the object with movie name and it's number.
-    for (let movie = 1; movie < cinemaArray.length; movie++) { // för varje film
+    for (let movie = 1; movie < cinemaArray.length; movie++) {
+      console.log(cinemaArray)
       for (let day = 5; day < 8; day++) {
         let checkAvailaibility = await fetch(`${this.orginalUrl}/cinema/check?day=0${day}&movie=0${movie}`)
         checkAvailaibility = await checkAvailaibility.json()
@@ -162,7 +163,7 @@ export class CompileData {
    */
   async checkDinner () {
     let dom
-    // CODE CREDIT / HELP: Teaching Assistans.
+    // CODE CREDIT / HELP: Teaching Assistance.
     await fetch(`${this.orginalUrl}/dinner/login`, {
       method: 'POST',
       headers: {
@@ -190,7 +191,7 @@ export class CompileData {
   }
 
   /**
-   * Checks which day that matches the day in this.namedDays.
+   * Checks which day/days that matches the day/days in this.namedDays.
    */
   compareDinnerDays () {
     this.changeNumbersToDays()
@@ -215,10 +216,11 @@ export class CompileData {
   }
 
   /**
-   * 
+   * Creates an object with the available day and time.
    */
   createObjectWithTime () {
     for (const dinner of this.matchedDaysAndDinners) {
+      console.log(dinner)
       const day = dinner.substring(0, 3)
       let time = dinner.substring(3, 7)
       time = `${time.substring(0, 2)}:00 - ${time.substring(2, 4)}:00`
@@ -255,7 +257,7 @@ export class CompileData {
   }
 
   /**
-   * Check which day that is passed in as an argument.
+   * Check and compare the day that is passed in as an argument.
    *
    * @param {string} day - the day that's going to be compared.
    * @returns {string} - returns the matched day.
@@ -268,8 +270,11 @@ export class CompileData {
     return result
   }
 
-   /**
+  /**
+   * Check and compare the day that is passed in as an argument.
    *
+   * @param {string} day - the day that's going to be compared.
+   * @returns {string} - returns the result that matched the argument.
    */
   changeDayToWeekDayWord (day) {
     let result = ''
@@ -277,16 +282,5 @@ export class CompileData {
     else if (day === 'sat') result = 'saturday'
     else if (day === 'sun') result = 'sunday'
     return result
-  }
-
-  /**
-   *
-   */
-  bookingOutput (suggestion) {
-    const output = suggestion.map(obj => {
-      obj.day = this.changeDayToWeekDayWord(obj.day)
-      return `* On ${obj.day}, "${obj.movie}" begins at ${obj.cinemaTime} and there is a free table to book between ${obj.dinner}`
-    })
-    console.log('\n' + 'Suggestions' + '\n' + '===========' + '\n' + output.join('\n') + '\n')
   }
 }

@@ -38,8 +38,8 @@ export class CompileData {
    */
   async run () {
     const links = await this.retrieveData('a', 'href')
-    this.checkRetriveData(links, 'links') // kollar om vi fick något värde från retrieveData
-    this.links = [...new Set(links)] // Sparas i en array
+    this.checkRetriveData(links, 'links')
+    this.links = [...new Set(links)]
     this.checkCalendar()
   }
 
@@ -74,13 +74,13 @@ export class CompileData {
    */
   async checkCalendar () {
     const object2 = {}
-    this.url = this.links[0] // this.url sätts om till första indexet i vår array.
-    const calendarUrl = await this.retrieveData('a', 'href') // calenderUrl är en array med svaret vi fick av scraper "return Array.from.." via retrieveData.
+    this.url = this.links[0]
+    const calendarUrl = await this.retrieveData('a', 'href')
     this.checkRetriveData(calendarUrl, 'available days')
 
     await Promise.all(calendarUrl.map(async name => {
-      this.url = this.links[0] + name.substring(2, name.length) // substring extraherar delar av en sträng. (dvs i ./paul.html så tas ./ bort)
-      const data = await this.retrieveData('td', 'textContent') // metoden retrieveData kallas på. 'td' och 'textContent' skickas med i det här fallet.
+      this.url = this.links[0] + name.substring(2, name.length)
+      const data = await this.retrieveData('td', 'textContent')
       const lowerCaseData = data.map(name => name.toLowerCase())
       const weekdays = await this.retrieveData('th', 'textContent')
       weekdays.forEach((value, index) => {
@@ -91,10 +91,9 @@ export class CompileData {
           object2[value] += 1
         }
       })
-      // console.log(object2)
     }))
 
-    const validDays = Object.entries(object2) // checks which day they all can meet.
+    const validDays = Object.entries(object2)
       .map(([key, value]) => value === 3 && key)
       .filter(day => day)
 
@@ -111,7 +110,7 @@ export class CompileData {
    */
   async checkCinema () {
     this.url = this.links[1]
-    const cinema = await this.scraper.runScraper(this.url) // Får domData från Scraper med värdet i this.url
+    const cinema = await this.scraper.runScraper(this.url)
     this.checkRetriveData(cinema, 'showtimes')
     const cinemaArray = Array.from(cinema.window.document.querySelectorAll('#movie > option'))
       .map(movie => {
@@ -120,7 +119,7 @@ export class CompileData {
           name: movie.textContent
         }
       })
-      // console.log(cinemaArray) // the object with movie name and it's number.
+
     for (let movie = 1; movie < cinemaArray.length; movie++) {
       for (let day = 5; day < 8; day++) {
         let checkAvailaibility = await fetch(`${this.orginalUrl}/cinema/check?day=0${day}&movie=0${movie}`)
@@ -159,7 +158,7 @@ export class CompileData {
    */
   async checkDinner () {
     let dom
-    // COOKIE CODE CREDIT: Teaching Assistans.
+    // COOKIE CODE CREDIT: Teaching Assistants.
     await fetch(`${this.orginalUrl}/dinner/login`, {
       method: 'POST',
       headers: {
@@ -192,9 +191,9 @@ export class CompileData {
   compareDinnerDays () {
     this.changeNumbersToDays()
 
-    for (const dinner of this.dinners) { // dinner = fri1416 m.fl.
-      const dinnerDay = dinner.substring(0, 3) // dinnerDay = fri, sat, sun m.fl
-      for (const day of this.namedDays) { // this.namedDays = the day that is free.
+    for (const dinner of this.dinners) {
+      const dinnerDay = dinner.substring(0, 3)
+      for (const day of this.namedDays) {
         if (dinnerDay === day) this.matchedDaysAndDinners.push(dinner)
       }
     }
@@ -206,7 +205,7 @@ export class CompileData {
    */
   changeNumbersToDays () {
     for (const day of this.weekDay) {
-      const dayName = this.changeDayToShortWord(day) // 05 skickas in till metoden
+      const dayName = this.changeDayToShortWord(day)
       this.namedDays.push(dayName)
     }
   }

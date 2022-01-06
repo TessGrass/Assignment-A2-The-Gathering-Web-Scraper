@@ -217,7 +217,7 @@ export class CompileData {
     for (const dinner of this.matchedDaysAndDinners) {
       const day = dinner.substring(0, 3)
       let time = dinner.substring(3, 7)
-      time = `${time.substring(0, 2)}:00 - ${time.substring(2, 4)}:00`
+      time = `${time.substring(0, 2)}:00-${time.substring(2, 4)}:00`
       const object = {
         day: day,
         time: time
@@ -272,9 +272,9 @@ export class CompileData {
    */
   changeDayToWeekDayWord (day) {
     let result = ''
-    if (day === 'fri') result = 'friday'
-    else if (day === 'sat') result = 'saturday'
-    else if (day === 'sun') result = 'sunday'
+    if (day === 'fri') result = 'Friday'
+    else if (day === 'sat') result = 'Saturday'
+    else if (day === 'sun') result = 'Sunday'
     return result
   }
 
@@ -286,7 +286,7 @@ export class CompileData {
   bookingOutput (suggestion) {
     const output = suggestion.map(obj => {
       obj.day = this.changeDayToWeekDayWord(obj.day)
-      return `* On ${obj.day}, "${obj.movie}" begins at ${obj.cinemaTime} and there is a free table to book between ${obj.dinner}`
+      return `* On ${obj.day}, "${obj.movie}" begins at ${obj.cinemaTime}, and there is a free table to book between ${obj.dinner}`
     })
     console.log('\n' + 'Suggestions' + '\n' + '===========' + '\n' + output.join('\n') + '\n')
   }

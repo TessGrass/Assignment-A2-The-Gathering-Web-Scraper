@@ -145,7 +145,7 @@ export class CompileData {
   /**
    * Checks which movie/movies that is available on the day found in this.weekDay.
    */
-  async compareDaysAndMovies () {
+  compareDaysAndMovies () {
     for (const movie of this.arrayOfMovies) {
       for (const day of this.weekDay) {
         if (movie.day === day) this.cinemaResult.push(movie)

@@ -11,7 +11,7 @@ import fetch from 'node-fetch'
 /**
  * Representing a web scraper.
  */
-export default class Scraper {
+export class Scraper {
   /**
    * Creates an instance of the current type.
    *

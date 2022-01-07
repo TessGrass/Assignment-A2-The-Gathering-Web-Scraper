@@ -7,7 +7,7 @@
 
 import { JSDOM } from 'jsdom'
 import fetch from 'node-fetch'
-import Scraper from './Scraper.js'
+import Scraper from './scraper.js'
 
 /**
  * Represents a web scraper application.
